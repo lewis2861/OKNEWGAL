@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>글 상세보기</title>
+    <style>
+        .navbar { background:#333; overflow:hidden; }
+        .navbar a { float:left; color:white; padding:14px 20px; text-decoration:none; }
+        .navbar a:hover { background:#575757; }
+        body { font-family:Arial, sans-serif; padding:20px; }
+        .post { border:1px solid #ddd; padding:10px; margin-bottom:20px; }
+        .comment { border-top:1px solid #ddd; padding:5px; }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <a href="index.html">홈</a>
+        <a href="news.html">뉴스 게시판</a>
+        <a href="free.html">자유 게시판</a>
+    </div>
+
+    <h1>글 상세보기</h1>
+    <div class="post" id="post"></div>
+
+    <h2>댓글</h2>
+    <div id="comments"></div>
+
+    <form id="commentForm">
+        <input type="text" id="commentInput" placeholder="댓글을 입력하세요" required>
+        <button type="submit">등록</button>
+    </form>
+
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        const board = params.get("board");
+        const id = parseInt(params.get("id"));
+
+        // 게시글 로드
+        let posts = JSON.parse(localStorage.getItem(board)) || [];
+        let post = posts[id];
+        document.getElementById("post").innerHTML = `<h3>${post.title}</h3><p>${post.content}</p>`;
+
+        // 댓글 로드
+        function loadComments() {
+            let commentsData = JSON.parse(localStorage.getItem(board + "_comments")) || {};
+            let comments = commentsData[id] || [];
+            let container = document.getElementById("comments");
+            container.innerHTML = "";
+            comments.forEach(c => {
+                let div = document.createElement("div");
+                div.className = "comment";
+                div.textContent = c;
+                container.appendChild(div);
+            });
+        }
+
+        loadComments();
+
+        // 댓글 등록
+        document.getElementById("commentForm").addEventListener("submit", function(e) {
+            e.preventDefault();
+            let commentText = document.getElementById("commentInput").value;
+            let commentsData = JSON.parse(localStorage.getItem(board + "_comments")) || {};
+            if (!commentsData[id]) commentsData[id] = [];
+            commentsData[id].push(commentText);
+            localStorage.setItem(board + "_comments", JSON.stringify(commentsData));
+            document.getElementById("commentInput").value = "";
+            loadComments();
+        });
+    </script>
+</body>
+</html>

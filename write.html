@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>글쓰기</title>
+    <style>
+        body { font-family:Arial, sans-serif; padding:20px; }
+        input, textarea { width:100%; margin:10px 0; padding:10px; }
+        button { padding:10px 15px; }
+    </style>
+</head>
+<body>
+    <h1>글쓰기</h1>
+    <form id="writeForm">
+        <input type="text" id="title" placeholder="제목" required>
+        <textarea id="content" placeholder="내용을 입력하세요" required></textarea>
+        <button type="submit">등록</button>
+    </form>
+
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        const board = params.get("board"); // news or free
+
+        document.getElementById("writeForm").addEventListener("submit", function(e) {
+            e.preventDefault();
+            let title = document.getElementById("title").value;
+            let content = document.getElementById("content").value;
+
+            let posts = JSON.parse(localStorage.getItem(board)) || [];
+            posts.unshift({ title, content }); // 최신 글이 위에 표시되도록
+            localStorage.setItem(board, JSON.stringify(posts));
+
+            // 등록 후 해당 게시판으로 이동
+            if (board === "news") {
+                window.location.href = "news.html";
+            } else if (board === "free") {
+                window.location.href = "free.html";
+            }
+        });
+    </script>
+</body>
+</html>
